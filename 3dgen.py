@@ -43,22 +43,6 @@ def exportSTEP(doc, outdir, name):
     import ImportGui
     ImportGui.export(doc.Objects, filename)
 
-def exportScaledVRML(doc, outdir, name, scale=1/2.54):
-    filename = os.path.join(outdir, name + '.wrl')
-    objs = doc.Objects
-    s = doc.addObject("Part::Feature", "VRML_model")
-    s.Shape = objs[0].Shape
-    s.ViewObject.ShapeColor = objs[0].ViewObject.ShapeColor
-    s.ViewObject.LineColor = objs[0].ViewObject.LineColor
-    s.ViewObject.PointColor = objs[0].ViewObject.PointColor
-    s.ViewObject.DiffuseColor = objs[0].ViewObject.DiffuseColor
-    doc.recompute()
-    Draft.scale(s, delta=Vector(scale, scale, scale), legacy=True)
-    doc.recompute()
-    Gui.export([s], filename)
-    doc.removeObject(s.Name)
-    
-
 def fuseAllObjects(doc, name):
     objs = doc.Objects
     f = doc.addObject("Part::MultiFuse", "Fusion")
@@ -81,6 +65,7 @@ if __name__ == "__main__":
     script_dir=os.path.dirname(os.path.realpath(__file__))
     db_dir = os.path.join("database")
     doc = FreeCAD.newDocument("3DPartGen")
+
     for library in libraries.__all__:
         FreeCAD.Console.PrintMessage("Processing Library '"+ library +"'\n")
         libmod = vars(libraries)[library]
@@ -99,7 +84,5 @@ if __name__ == "__main__":
             
             exportSTEP(doc, out_dir, part)
             FreeCAD.Console.PrintMessage("Exported STEP!\n")
-            exportScaledVRML(doc, out_dir, part)
-            FreeCAD.Console.PrintMessage("Exported VRML!\n")
     FreeCAD.closeDocument(doc.Name)
     exit()

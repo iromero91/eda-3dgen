@@ -8,8 +8,8 @@ s_topleft = _s('|Z') & _s('<X') & _s('>Y')
 
 def rowArray(self, e, n, offset, angle):
     wp = self.transformed(rotate=(0, 0, angle))\
-             .transformed(offset=(-e*(n-1)*0.5, -offset, 0))
-    return wp.pushPoints([(e*i, 0) for i in range(n)])
+             .transformed(offset=(-offset, -e*(n-1)*0.5, 0))
+    return wp.pushPoints([(0, e*i) for i in range(n)])
 
 cq.Workplane.rowArray = rowArray
 
@@ -100,8 +100,10 @@ def epoxyCase(self, D, E, A, A1=0.05, fp_d=0.5, fp_o=0.7, fp_z=0.1):
                .workplane(offset=A2/2).rect(D, E)\
                .workplane(offset=A2/2).rect(D2, E2).loft(ruled=True)
     if fp_d > 0 and fp_z > 0:
+        fp_d = min(fp_d, min(D,E)/4.)
+        fp_o = min(fp_o, min(D,E)/3.)
         case = case.faces(">Z").workplane()\
-                               .pushPoints([(-D*0.5+fp_o, E*0.5-fp_o)])\
+                               .pushPoints([(-D*0.5+fp_o, -E*0.5+fp_o)])\
                                .hole(fp_d, fp_z)
     return case
 
