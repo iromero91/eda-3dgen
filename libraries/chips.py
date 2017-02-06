@@ -61,7 +61,7 @@ def read_params(filename):
             A = Dimension(row['A'])
             L = Dimension(row['L'])
             family = row["family"].upper()
-            parms = Params(D.max,E.max,A.max,L.max,family,
+            parms = Params(D,E,A,L,family,
                            modelName = ("%s%dX%dX%dL%d" %
                                         (family,
                                          int(D.nom*100), int(E.nom*100),
@@ -75,29 +75,29 @@ def make(params, top_color=None, case_color=None, pins_color=None):
     import cadquery as cq
     from Helpers import show
 
-    pt = min(0.025, params.A/10) # Plating thickness
-    ef = min(0.020, params.A/20) # Edge fillet
+    pt = min(0.025, params.A.min/10) # Plating thickness
+    ef = min(0.020, params.A.min/20) # Edge fillet
 
     wp = cq.Workplane("XY")
 
-    pin1 = wp.box(params.L, params.E, params.A)\
-             .translate((-params.D/2 + params.L/2, 0, params.A/2))
+    pin1 = wp.box(params.L.max, params.E.max, params.A.max)\
+             .translate((-params.D.max/2 + params.L.max/2, 0, params.A.max/2))
     pin1.edges("|Y").fillet(ef)
-    pin2 = wp.box(params.L, params.E, params.A)\
-             .translate((params.D/2 - params.L/2, 0, params.A/2))
+    pin2 = wp.box(params.L.max, params.E.max, params.A.max)\
+             .translate((params.D.max/2 - params.L.max/2, 0, params.A.max/2))
     pin2.edges("|Y").fillet(ef)
     pins = pin1.union(pin2)
 
     if params.family == "RESC":
-        case = wp.box(params.D - 2*pt, params.E, params.A - 2*pt)\
-                 .translate((0, 0, params.A/2))
-        top = wp.box(params.D - 2*params.L, params.E, pt)\
-                .translate((0, 0, params.A - pt/2))
+        case = wp.box(params.D.max - 2*pt, params.E.max, params.A.max - 2*pt)\
+                 .translate((0, 0, params.A.max/2))
+        top = wp.box(params.D.max - 2*params.L.max, params.E.max, pt)\
+                .translate((0, 0, params.A.max - pt/2))
         pins = pins.cut(case)
         show(top, top_color or COLOR_BLACK)
     elif params.family in ["CAPC", "INDC"]:
-        case = wp.box(params.D - 2*params.L, params.E - 2*pt, params.A - 2*pt)\
-                 .translate((0, 0, params.A/2))
+        case = wp.box(params.D.max - 2*params.L.max, params.E.max - 2*pt, params.A.max - 2*pt)\
+                 .translate((0, 0, params.A.max/2))
         case.edges("|X").fillet(ef)
         pins.edges("|X").fillet(ef)
         case = case.cut(pins)
