@@ -26,6 +26,7 @@
 
 from collections import namedtuple
 import csv
+from dimension import Dimension
 
 COLOR_PEACH = (139, 119, 101, 0)
 COLOR_BLACK = (25, 25, 25, 0)
@@ -34,9 +35,9 @@ COLOR_WHITE = (255, 255, 255, 0)
 COLOR_SILVER = (230, 230, 230, 0)
 
 default_case_color = {
-    'resistor': COLOR_WHITE,
-    'capacitor': COLOR_PEACH,
-    'inductor': COLOR_DARK_GREY
+    'RESC': COLOR_WHITE,
+    'CAPC': COLOR_PEACH,
+    'INDC': COLOR_DARK_GREY
 }
 
 Params = namedtuple("Params", [
@@ -55,15 +56,20 @@ def read_params(filename):
     with open(filename) as csvfile:
         db = csv.DictReader(csvfile)
         for row in db:
-            all_params[row["case_code"]] = Params(
-                D = float(row['D']),
-                E = float(row['E']),
-                A = float(row['A']),
-                L = float(row['L']),
-                family = row['family'].lower(),
-                modelName = row["case_code"],
-                rotation = 0
+            D = Dimension(row['D'])
+            E = Dimension(row['E'])
+            A = Dimension(row['A'])
+            L = Dimension(row['L'])
+            family = row["family"].upper()
+            parms = Params(D.max,E.max,A.max,L.max,family,
+                           modelName = ("%s%dX%dX%dL%d" %
+                                        (family,
+                                         int(D.nom*100), int(E.nom*100),
+                                         int(A.max*100),
+                                         int(L.nom*100)) ),
+                           rotation = 0
             )
+            all_params[parms.modelName] = parms
 
 def make(params, top_color=None, case_color=None, pins_color=None):
     import cadquery as cq
@@ -82,14 +88,14 @@ def make(params, top_color=None, case_color=None, pins_color=None):
     pin2.edges("|Y").fillet(ef)
     pins = pin1.union(pin2)
 
-    if params.family == "resistor":
+    if params.family == "RESC":
         case = wp.box(params.D - 2*pt, params.E, params.A - 2*pt)\
                  .translate((0, 0, params.A/2))
         top = wp.box(params.D - 2*params.L, params.E, pt)\
                 .translate((0, 0, params.A - pt/2))
         pins = pins.cut(case)
         show(top, top_color or COLOR_BLACK)
-    elif params.family in ["capacitor", "inductor"]:
+    elif params.family in ["CAPC", "INDC"]:
         case = wp.box(params.D - 2*params.L, params.E - 2*pt, params.A - 2*pt)\
                  .translate((0, 0, params.A/2))
         case.edges("|X").fillet(ef)
