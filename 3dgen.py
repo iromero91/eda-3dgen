@@ -3,7 +3,7 @@
 
 # This file is part of 3dgen, a free 3d model generator for EDA
 #
-# Copyright (C) 2016 José I. Romero <jir@exp1.com.ar>
+# Copyright (C) 2016-2017 José I. Romero <jir@exp1.com.ar>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License (GPL)
