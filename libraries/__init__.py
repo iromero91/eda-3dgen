@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # This file is part of 3dgen, a free 3d model generator for EDA
 #
 # Copyright (C) 2016-2017 José I. Romero <jir@exp1.com.ar>
