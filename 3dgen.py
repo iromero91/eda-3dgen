@@ -59,12 +59,15 @@ def fuseAllObjects(doc, name):
         doc.removeObject(o.Name)
     doc.removeObject(f.Name)
     
-import libraries
-
 if __name__ == "__main__":
     script_dir=os.path.dirname(os.path.realpath(__file__))
-    db_dir = os.path.join("database")
+    db_dir = os.path.join(script_dir, "database")
     doc = FreeCAD.newDocument("3DPartGen")
+
+    import sys
+    sys.path.append(script_dir)
+    
+    import libraries
 
     for library in libraries.__all__:
         FreeCAD.Console.PrintMessage("Processing Library '"+ library +"'\n")
